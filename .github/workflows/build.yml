@@ -20,7 +20,7 @@ jobs:
 
     - name: Run Python Script to Generate HTML
       run: |
-        python render_smoothies.py  # Run the script to render the HTML file
+        python render.py  # Run the script to render the HTML file
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
