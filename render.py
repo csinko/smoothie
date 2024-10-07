@@ -88,6 +88,58 @@ def calculate_macros(ingredients):
     }
 
 
+def generate_macro_bar(ingredients, total_calories):
+    bar_html = '<div class="flex flex-col w-full">'
+    colors = {"protein": "bg-blue-600", "fat": "bg-yellow-400", "carbs": "bg-green-500"}
+    macro_totals = {"protein": 0, "fat": 0, "carbs": 0}
+
+    def darken_color(color, amount=200):
+        # Extract the color number from the Tailwind class
+        base = int(color.split("-")[-1])
+        # Calculate the darker shade (minimum 900)
+        darker = min(base + amount, 900)
+        # Return the new color class
+        return f"{color.rsplit('-', 1)[0]}-{darker}"
+
+    for macro in ["protein", "fat", "carbs"]:
+        macro_calories = sum(
+            getattr(ingredient, macro) * (4 if macro != "fat" else 9)
+            for ingredient in ingredients
+        )
+        macro_totals[macro] = macro_calories
+        percentage = (macro_calories / total_calories) * 100
+
+        bar_html += f'<div class="mb-2"><p class="font-medium">{macro.capitalize()}: {macro_totals[macro]:.1f} calories ({percentage:.1f}%) - {sum(getattr(ingredient, macro) for ingredient in ingredients):.1f}g</p>'
+        bar_html += (
+            f'<div class="relative h-6 rounded-full overflow-hidden bg-gray-200">'
+        )
+
+        cumulative_percentage = 0
+        for ingredient in ingredients:
+            ingredient_macro = getattr(ingredient, macro)
+            ingredient_calories = ingredient_macro * (4 if macro != "fat" else 9)
+            ingredient_percentage = (ingredient_calories / total_calories) * 100
+
+            bar_html += f'<div class="{colors[macro]} h-full absolute" style="left: {cumulative_percentage}%; width: {ingredient_percentage}%;" title="{ingredient.name}: {ingredient_macro:.1f}g ({ingredient_calories:.1f} calories)"></div>'
+            cumulative_percentage += ingredient_percentage
+
+        # Add darker divider lines on top
+        cumulative_percentage = 0
+        for ingredient in ingredients:
+            ingredient_macro = getattr(ingredient, macro)
+            ingredient_calories = ingredient_macro * (4 if macro != "fat" else 9)
+            ingredient_percentage = (ingredient_calories / total_calories) * 100
+            cumulative_percentage += ingredient_percentage
+            if cumulative_percentage < 100:
+                darker_color = darken_color(colors[macro])
+                bar_html += f'<div class="h-full w-0.5 {darker_color} absolute z-10" style="left: {cumulative_percentage}%;"></div>'
+
+        bar_html += "</div></div>"
+
+    bar_html += "</div>"
+    return bar_html, macro_totals
+
+
 # Load the smoothie data from the recipes.json file
 with open("recipes.json", "r") as f:
     smoothies_data = json.load(f)
@@ -172,20 +224,11 @@ for smoothie in smoothies_data["smoothies"]:
 
     smoothie_html += f"""
       </ul>
-      <h3 class="text-xl font-medium text-green-600 mt-4 mb-2">Macronutrients:</h3>
-      <div class="bg-green-50 p-4 rounded-lg">
-        <p class="text-lg mb-2">Total Calories: {macros['calories']}</p>
-        <div class="flex justify-between mb-2">
-          <span>Protein: {macros['protein']}g ({round(macros['protein']/total_macros*100, 1)}%)</span>
-          <span>Fat: {macros['fat']}g ({round(macros['fat']/total_macros*100, 1)}%)</span>
-          <span>Carbs: {macros['carbs']}g ({round(macros['carbs']/total_macros*100, 1)}%)</span>
-        </div>
-        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-          <div class="bg-blue-600 h-2.5 rounded-full" style="width: {round(macros['protein']/total_macros*100, 1)}%"></div>
-          <div class="bg-yellow-400 h-2.5 rounded-full" style="width: {round(macros['fat']/total_macros*100, 1)}%"></div>
-          <div class="bg-green-500 h-2.5 rounded-full" style="width: {round(macros['carbs']/total_macros*100, 1)}%"></div>
-        </div>
-      </div>
+             <h3 class="text-xl font-medium text-green-600 mt-4 mb-2">Macronutrients:</h3>
+             <div class="bg-green-50 p-4 rounded-lg">
+               <p class="text-lg mb-2">Total Calories: {macros['calories']}</p>
+               {generate_macro_bar(parsed_ingredients, macros['calories'])[0]}
+             </div>
       <p class="text-lg mt-4"><strong>Why:</strong> {smoothie['why']}</p>
     </div>
     """
