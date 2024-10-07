@@ -2,7 +2,7 @@
   "smoothies": [
     {
       "title": "Polyphenol Power Smoothie",
-      "image": "smoothie-01.webp",
+      "image": "assets/smoothie-01.webp",
       "ingredients": [
         "1 cup spinach",
         "1/2 cup blueberries",
@@ -17,7 +17,7 @@
     },
     {
       "title": "Green Gut Detox Smoothie",
-      "image": "smoothie-02.webp",
+      "image": "assets/smoothie-02.webp",
       "ingredients": [
         "1 cup spinach",
         "1/2 green banana",
@@ -32,7 +32,7 @@
     },
     {
       "title": "Berry Blast Prebiotic Smoothie",
-      "image": "smoothie-03.webp",
+      "image": "assets/smoothie-03.webp",
       "ingredients": [
         "1 cup kale",
         "1/2 green banana",
@@ -46,7 +46,7 @@
     },
     {
       "title": "Fiber-Boost Smoothie",
-      "image": "smoothie-04.webp",
+      "image": "assets/smoothie-04.webp",
       "ingredients": [
         "1 cup kale",
         "1 green banana",
@@ -59,7 +59,7 @@
     },
     {
       "title": "Ginger-Turmeric Gut Soother",
-      "image": "smoothie-05.webp",
+      "image": "assets/smoothie-05.webp",
       "ingredients": [
         "1 cup spinach",
         "1/2 cup mango",
@@ -73,7 +73,7 @@
     },
     {
       "title": "Anti-Inflammatory Avocado Smoothie",
-      "image": "smoothie-06.webp",
+      "image": "assets/smoothie-06.webp",
       "ingredients": [
         "1 cup kale",
         "1/2 avocado",
@@ -87,7 +87,7 @@
     },
     {
       "title": "Blueberry-Kefir Gut Restorer",
-      "image": "smoothie-07.webp",
+      "image": "assets/smoothie-07.webp",
       "ingredients": [
         "1 cup spinach",
         "1/2 cup blueberries",

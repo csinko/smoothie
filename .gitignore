@@ -1,0 +1,30 @@
+# Ignore Vim swap files
+*.swp
+*.swo
+*.swn
+
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Ignore bytecode compiled Python files
+*.pyc
+
+# Ignore virtual environment directories
+env/
+venv/
+ENV/
+.venv/
+
+# Ignore compressed files in the assets directory
+assets/*.webp_compressed
+assets/*_compressed.webp
+
+# Ignore log files
+*.log
+
+# Ignore local configuration files
+*.local
+
