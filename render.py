@@ -1,8 +1,12 @@
 import json
 
-# Load the smoothie data from the JSON file
-with open("smoothies.json", "r") as f:
+# Load the smoothie data from the recipes.json file
+with open("recipes.json", "r") as f:
     smoothies_data = json.load(f)
+
+# Load the ingredient descriptions from the ingredients.json file
+with open("ingredients.json", "r") as f:
+    ingredients_data = json.load(f)
 
 # Start building the HTML content with a basic structure
 html_content = """
@@ -60,9 +64,16 @@ for smoothie in smoothies_data["smoothies"]:
       <ul class="list-disc list-inside text-lg">
     """
 
-    # Add ingredients as list items
-    for ingredient in smoothie["ingredients"]:
-        smoothie_html += f"<li>{ingredient}</li>\n"
+    # Add ingredients as list items with descriptions if available in the ingredients.json file
+    for ingredient_string in smoothie["ingredients"]:
+        ingredient_name = ingredient_string.split(" ", 1)[
+            1
+        ]  # Extract the ingredient name
+        description = ingredients_data.get(ingredient_name, {}).get("description", "")
+        smoothie_html += f"<li>{ingredient_string}"
+        if description:
+            smoothie_html += f" - {description}"
+        smoothie_html += "</li>\n"
 
     smoothie_html += f"""
       </ul>
@@ -93,3 +104,4 @@ with open("index.html", "w") as html_file:
     html_file.write(html_content)
 
 print("HTML file generated successfully!")
+

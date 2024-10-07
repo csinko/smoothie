@@ -1,0 +1,103 @@
+{
+  "smoothies": [
+    {
+      "title": "Polyphenol Power Smoothie",
+      "image": "smoothie-01.webp",
+      "ingredients": [
+        "1 cup spinach",
+        "1/2 cup blueberries",
+        "1/2 green banana",
+        "1 tbsp flaxseeds",
+        "1/2 avocado",
+        "1/2 cup pomegranate juice",
+        "1/2 cup kombucha",
+        "1 cup coconut water"
+      ],
+      "why": "Rich in polyphenols, prebiotics, and probiotics to target Bacteroides overgrowth and promote good bacteria like Bifidobacteria."
+    },
+    {
+      "title": "Green Gut Detox Smoothie",
+      "image": "smoothie-02.webp",
+      "ingredients": [
+        "1 cup spinach",
+        "1/2 green banana",
+        "1/2 cup kefir",
+        "1/2 cup blueberries",
+        "1 tbsp flaxseeds",
+        "1/2 inch ginger",
+        "1/4 tsp turmeric",
+        "1 cup almond milk"
+      ],
+      "why": "Boosts beneficial bacteria (Bifidobacteria and Lactobacillus) with prebiotics and probiotics, while reducing gut inflammation."
+    },
+    {
+      "title": "Berry Blast Prebiotic Smoothie",
+      "image": "smoothie-03.webp",
+      "ingredients": [
+        "1 cup kale",
+        "1/2 green banana",
+        "1/2 cup blackberries",
+        "1 tbsp chia seeds",
+        "1/2 cup pomegranate juice",
+        "1/2 avocado",
+        "1 cup coconut water"
+      ],
+      "why": "High in fiber, prebiotics, and polyphenols to feed good bacteria and reduce harmful bacteria overgrowth."
+    },
+    {
+      "title": "Fiber-Boost Smoothie",
+      "image": "smoothie-04.webp",
+      "ingredients": [
+        "1 cup kale",
+        "1 green banana",
+        "1/2 cup blackberries",
+        "1 tbsp chicory root powder",
+        "1 tbsp flaxseeds",
+        "1 cup almond milk"
+      ],
+      "why": "Packed with fiber and prebiotics to promote beneficial bacteria growth and balance the gut microbiome."
+    },
+    {
+      "title": "Ginger-Turmeric Gut Soother",
+      "image": "smoothie-05.webp",
+      "ingredients": [
+        "1 cup spinach",
+        "1/2 cup mango",
+        "1/2 inch ginger",
+        "1/4 tsp turmeric",
+        "1 tbsp chia seeds",
+        "1/2 cup kefir",
+        "1 cup coconut water"
+      ],
+      "why": "Focuses on reducing inflammation with ginger and turmeric, while providing probiotics and fiber for gut health."
+    },
+    {
+      "title": "Anti-Inflammatory Avocado Smoothie",
+      "image": "smoothie-06.webp",
+      "ingredients": [
+        "1 cup kale",
+        "1/2 avocado",
+        "1/2 inch ginger",
+        "1 tbsp flaxseeds",
+        "1/4 tsp turmeric",
+        "1/2 cup kefir",
+        "1 cup almond milk"
+      ],
+      "why": "Helps reduce gut inflammation while supporting digestion and promoting beneficial bacteria with kefir."
+    },
+    {
+      "title": "Blueberry-Kefir Gut Restorer",
+      "image": "smoothie-07.webp",
+      "ingredients": [
+        "1 cup spinach",
+        "1/2 cup blueberries",
+        "1/2 green banana",
+        "1 tbsp flaxseeds",
+        "1/2 cup kefir",
+        "1 tsp chicory root powder",
+        "1 cup almond milk"
+      ],
+      "why": "Contains probiotics and polyphenols to restore gut balance but is less fiber-dense than other options."
+    }
+  ]
+}
