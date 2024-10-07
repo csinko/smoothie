@@ -1,0 +1,30 @@
+name: Build and Deploy Smoothie Recipes
+
+on:
+  push:
+    branches:
+      - master # Deploy when changes are pushed to the master branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'  # Use a Python 3.x version
+
+    - name: Run Python Script to Generate HTML
+      run: |
+        python render_smoothies.py  # Run the script to render the HTML file
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./  # Root directory containing the generated HTML file
+
