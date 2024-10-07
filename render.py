@@ -1,17 +1,25 @@
 import json
+from dataclasses import dataclass
+from typing import Optional
 
 
-def calculate_macros(ingredients, ingredients_data):
-    total_calories = 0
-    total_protein = 0
-    total_fat = 0
-    total_carbs = 0
+@dataclass
+class Ingredient:
+    name: str
+    amount: float
+    amount_str: str
+    unit: str
+    calories: float
+    protein: float
+    fat: float
+    carbs: float
+    description: Optional[str] = None
 
-    for ingredient_string in ingredients:
+    @classmethod
+    def from_string(cls, ingredient_string: str, ingredients_data: dict):
         parts = ingredient_string.split()
         amount = parts[0]
 
-        # Check if the second part is a valid unit or a number
         if len(parts) > 1 and (
             parts[1] in ["tsp", "tbsp", "cup", "whole"] or parts[1].isdigit()
         ):
@@ -21,36 +29,56 @@ def calculate_macros(ingredients, ingredients_data):
             unit = "whole"
             name = " ".join(parts[1:])
 
-        if name in ingredients_data:
-            ingredient = ingredients_data[name]
-            multiplier = 1
+        if name not in ingredients_data:
+            raise ValueError(f"Ingredient '{name}' not found in ingredients data")
 
-            if unit in ["tsp", "tbsp"]:
-                # Convert tsp and tbsp to cups
-                multiplier = 1 / 48 if unit == "tsp" else 1 / 16
-            elif unit == "cup":
-                multiplier = eval(amount) if "/" in amount else float(amount)
-            elif unit == "whole" or unit.isdigit():
-                multiplier = eval(amount) if "/" in amount else float(amount)
+        ingredient_data = ingredients_data[name]
+        multiplier = cls._calculate_multiplier(amount, unit)
 
-            calories = ingredient["calories"] * multiplier
-            protein = ingredient["protein"] * multiplier
-            fat = ingredient["fat"] * multiplier
-            carbs = ingredient["carbohydrates"] * multiplier
+        return cls(
+            name=name,
+            amount=eval(amount) if "/" in amount else float(amount),
+            amount_str=amount,
+            unit=unit,
+            calories=ingredient_data["calories"] * multiplier,
+            protein=ingredient_data["protein"] * multiplier,
+            fat=ingredient_data["fat"] * multiplier,
+            carbs=ingredient_data["carbohydrates"] * multiplier,
+            description=ingredient_data.get("description"),
+        )
 
-            total_calories += calories
-            total_protein += protein
-            total_fat += fat
-            total_carbs += carbs
+    @staticmethod
+    def _calculate_multiplier(amount: str, unit: str) -> float:
+        if unit in ["tsp", "tbsp"]:
+            return 1 / 48 if unit == "tsp" else 1 / 16
+        elif unit == "cup":
+            return eval(amount) if "/" in amount else float(amount)
+        elif unit == "whole" or unit.isdigit():
+            return eval(amount) if "/" in amount else float(amount)
+        else:
+            return 1.0
 
-            # Print macros for each ingredient
-            print(f"Ingredient: {ingredient_string}")
-            print(f"  Parsed amount: {multiplier} cup(s)")
-            print(f"  Calories: {calories:.1f}")
-            print(f"  Protein: {protein:.1f}g")
-            print(f"  Fat: {fat:.1f}g")
-            print(f"  Carbs: {carbs:.1f}g")
-            print()
+
+def calculate_macros(ingredients):
+    total_calories = 0
+    total_protein = 0
+    total_fat = 0
+    total_carbs = 0
+
+    for ingredient in ingredients:
+        total_calories += ingredient.calories
+        total_protein += ingredient.protein
+        total_fat += ingredient.fat
+        total_carbs += ingredient.carbs
+
+        # Print macros for each ingredient
+        print(f"Ingredient: {ingredient.name}")
+        print(f"  Parsed amount: {ingredient.amount} {ingredient.unit}")
+        print(f"  Calories: {ingredient.calories:.1f}")
+        print(f"  Protein: {ingredient.protein:.1f}g")
+        print(f"  Fat: {ingredient.fat:.1f}g")
+        print(f"  Carbs: {ingredient.carbs:.1f}g")
+        print()
 
     return {
         "calories": round(total_calories, 1),
@@ -117,7 +145,14 @@ html_content = """
 # Loop through each smoothie in the JSON and append its HTML structure
 for smoothie in smoothies_data["smoothies"]:
     print(f"Calculating macros for {smoothie['title']}...")
-    macros = calculate_macros(smoothie["ingredients"], ingredients_data)
+
+    # Parse ingredients once
+    parsed_ingredients = [
+        Ingredient.from_string(ingredient_string, ingredients_data)
+        for ingredient_string in smoothie["ingredients"]
+    ]
+
+    macros = calculate_macros(parsed_ingredients)
     total_macros = macros["protein"] + macros["fat"] + macros["carbs"]
 
     smoothie_html = f"""
@@ -129,24 +164,10 @@ for smoothie in smoothies_data["smoothies"]:
     """
 
     # Add ingredients as list items with descriptions if available in the ingredients.json file
-    for ingredient_string in smoothie["ingredients"]:
-        parts = ingredient_string.split()
-        amount = parts[0]
-
-        # Check if the second part is a valid unit or a number
-        if len(parts) > 1 and (
-            parts[1] in ["tsp", "tbsp", "cup", "whole"] or parts[1].isdigit()
-        ):
-            unit = parts[1]
-            name = " ".join(parts[2:])
-        else:
-            unit = "whole"
-            name = " ".join(parts[1:])
-
-        description = ingredients_data.get(name, {}).get("description", "")
-        smoothie_html += f"<li><strong>{ingredient_string}</strong>"
-        if description:
-            smoothie_html += f" (<em>{description}</em>)"
+    for ingredient in parsed_ingredients:
+        smoothie_html += f"<li><strong>{ingredient.amount_str} {ingredient.unit} {ingredient.name}</strong>"
+        if ingredient.description:
+            smoothie_html += f" (<em>{ingredient.description}</em>)"
         smoothie_html += "</li>\n"
 
     smoothie_html += f"""
