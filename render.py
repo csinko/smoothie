@@ -1,5 +1,65 @@
 import json
 
+
+def calculate_macros(ingredients, ingredients_data):
+    total_calories = 0
+    total_protein = 0
+    total_fat = 0
+    total_carbs = 0
+
+    for ingredient_string in ingredients:
+        parts = ingredient_string.split()
+        amount = parts[0]
+
+        # Check if the second part is a valid unit or a number
+        if len(parts) > 1 and (
+            parts[1] in ["tsp", "tbsp", "cup", "whole"] or parts[1].isdigit()
+        ):
+            unit = parts[1]
+            name = " ".join(parts[2:])
+        else:
+            unit = "whole"
+            name = " ".join(parts[1:])
+
+        if name in ingredients_data:
+            ingredient = ingredients_data[name]
+            multiplier = 1
+
+            if unit in ["tsp", "tbsp"]:
+                # Convert tsp and tbsp to cups
+                multiplier = 1 / 48 if unit == "tsp" else 1 / 16
+            elif unit == "cup":
+                multiplier = eval(amount) if "/" in amount else float(amount)
+            elif unit == "whole" or unit.isdigit():
+                multiplier = eval(amount) if "/" in amount else float(amount)
+
+            calories = ingredient["calories"] * multiplier
+            protein = ingredient["protein"] * multiplier
+            fat = ingredient["fat"] * multiplier
+            carbs = ingredient["carbohydrates"] * multiplier
+
+            total_calories += calories
+            total_protein += protein
+            total_fat += fat
+            total_carbs += carbs
+
+            # Print macros for each ingredient
+            print(f"Ingredient: {ingredient_string}")
+            print(f"  Parsed amount: {multiplier} cup(s)")
+            print(f"  Calories: {calories:.1f}")
+            print(f"  Protein: {protein:.1f}g")
+            print(f"  Fat: {fat:.1f}g")
+            print(f"  Carbs: {carbs:.1f}g")
+            print()
+
+    return {
+        "calories": round(total_calories, 1),
+        "protein": round(total_protein, 1),
+        "fat": round(total_fat, 1),
+        "carbs": round(total_carbs, 1),
+    }
+
+
 # Load the smoothie data from the recipes.json file
 with open("recipes.json", "r") as f:
     smoothies_data = json.load(f)
@@ -56,6 +116,10 @@ html_content = """
 
 # Loop through each smoothie in the JSON and append its HTML structure
 for smoothie in smoothies_data["smoothies"]:
+    print(f"Calculating macros for {smoothie['title']}...")
+    macros = calculate_macros(smoothie["ingredients"], ingredients_data)
+    total_macros = macros["protein"] + macros["fat"] + macros["carbs"]
+
     smoothie_html = f"""
     <div class="mb-16">
       <h2 class="text-2xl font-semibold text-green-700 mb-4">{smoothie['title']}</h2>
@@ -66,17 +130,41 @@ for smoothie in smoothies_data["smoothies"]:
 
     # Add ingredients as list items with descriptions if available in the ingredients.json file
     for ingredient_string in smoothie["ingredients"]:
-        ingredient_name = ingredient_string.split(" ", 1)[
-            1
-        ]  # Extract the ingredient name
-        description = ingredients_data.get(ingredient_name, {}).get("description", "")
-        smoothie_html += f"<li>{ingredient_string}"
+        parts = ingredient_string.split()
+        amount = parts[0]
+
+        # Check if the second part is a valid unit or a number
+        if len(parts) > 1 and (
+            parts[1] in ["tsp", "tbsp", "cup", "whole"] or parts[1].isdigit()
+        ):
+            unit = parts[1]
+            name = " ".join(parts[2:])
+        else:
+            unit = "whole"
+            name = " ".join(parts[1:])
+
+        description = ingredients_data.get(name, {}).get("description", "")
+        smoothie_html += f"<li><strong>{ingredient_string}</strong>"
         if description:
-            smoothie_html += f" - {description}"
+            smoothie_html += f" (<em>{description}</em>)"
         smoothie_html += "</li>\n"
 
     smoothie_html += f"""
       </ul>
+      <h3 class="text-xl font-medium text-green-600 mt-4 mb-2">Macronutrients:</h3>
+      <div class="bg-green-50 p-4 rounded-lg">
+        <p class="text-lg mb-2">Total Calories: {macros['calories']}</p>
+        <div class="flex justify-between mb-2">
+          <span>Protein: {macros['protein']}g ({round(macros['protein']/total_macros*100, 1)}%)</span>
+          <span>Fat: {macros['fat']}g ({round(macros['fat']/total_macros*100, 1)}%)</span>
+          <span>Carbs: {macros['carbs']}g ({round(macros['carbs']/total_macros*100, 1)}%)</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+          <div class="bg-blue-600 h-2.5 rounded-full" style="width: {round(macros['protein']/total_macros*100, 1)}%"></div>
+          <div class="bg-yellow-400 h-2.5 rounded-full" style="width: {round(macros['fat']/total_macros*100, 1)}%"></div>
+          <div class="bg-green-500 h-2.5 rounded-full" style="width: {round(macros['carbs']/total_macros*100, 1)}%"></div>
+        </div>
+      </div>
       <p class="text-lg mt-4"><strong>Why:</strong> {smoothie['why']}</p>
     </div>
     """
@@ -104,4 +192,3 @@ with open("index.html", "w") as html_file:
     html_file.write(html_content)
 
 print("HTML file generated successfully!")
-
