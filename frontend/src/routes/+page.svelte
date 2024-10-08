@@ -45,6 +45,36 @@
     barHtml += "</div>";
     return barHtml;
   }
+
+  async function handleIngredientChange(smoothieIndex: number, ingredientIndex: number, newValue: string) {
+    console.log(`Smoothie ${smoothieIndex + 1}, Ingredient ${ingredientIndex + 1} modified:`, newValue);
+    
+    // Update the ingredient in the data
+    data.smoothies[smoothieIndex].ingredients[ingredientIndex] = newValue;
+  
+    // Call the API to recalculate macros
+    try {
+      const response = await fetch('http://localhost:8000/calculate-macros', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ingredients: data.smoothies[smoothieIndex].ingredients }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch macros');
+      }
+  
+      const newMacros = await response.json();
+  
+      // Update the macros for the smoothie
+      data.smoothies[smoothieIndex].macros = newMacros;
+    } catch (error) {
+      console.error('Error updating macros:', error);
+    }
+  }
+
 </script>
 
 <html lang="en">
@@ -89,16 +119,23 @@
   <!-- Content Section -->
   <section class="max-w-4xl mx-auto px-4 py-12">
     {#if data.smoothies.length > 0}
-      {#each data.smoothies as smoothie}
+      {#each data.smoothies as smoothie, smoothieIndex}
         <div class="mb-16">
           <h2 class="text-2xl font-semibold text-green-700 mb-4">{smoothie.title}</h2>
           <img src={"http://localhost:8000/" + smoothie.image} alt={smoothie.title} class="w-full max-w-sm mx-auto rounded-lg shadow-md mb-4">
           <h3 class="text-xl font-medium text-green-600 mb-2">Ingredients:</h3>
-          <ul class="list-disc list-inside text-lg">
-            {#each smoothie.ingredients as ingredient}
-              <li>{@html ingredient}</li>
+          <div class="space-y-1">
+            {#each smoothie.ingredients as ingredient, index}
+              <div>
+                <input
+                  type="text"
+                  value={ingredient}
+                  class="w-full p-1 border rounded"
+                  on:blur={(e) => handleIngredientChange(smoothieIndex, index, e.target.value)}
+                />
+              </div>
             {/each}
-          <!-- Macronutrients component -->
+          </div>
           {#if smoothie.macros}
             <h3 class="text-xl font-medium text-green-600 mt-4 mb-2">Macronutrients:</h3>
             <div class="bg-green-50 p-4 rounded-lg">
